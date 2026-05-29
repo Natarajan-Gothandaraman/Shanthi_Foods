@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#f8fafc"/>
+  <ellipse cx="200" cy="248" rx="95" ry="14" fill="#e2e8f0"/>
+  <circle cx="165" cy="185" r="42" fill="#fef08a" stroke="#eab308" stroke-width="2"/>
+  <circle cx="165" cy="185" r="18" fill="#f8fafc"/>
+  <circle cx="235" cy="195" r="40" fill="#fde047" stroke="#ca8a04" stroke-width="2"/>
+  <circle cx="235" cy="195" r="16" fill="#f8fafc"/>
+  <circle cx="200" cy="155" r="36" fill="#fef9c3" stroke="#eab308" stroke-width="2"/>
+  <circle cx="200" cy="155" r="14" fill="#f8fafc"/>
+  <text x="200" y="278" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="600" fill="#64748b">Poori</text>
+</svg>

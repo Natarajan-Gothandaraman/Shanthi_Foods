@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#f8fafc"/>
+  <ellipse cx="200" cy="248" rx="95" ry="14" fill="#e2e8f0"/>
+  <circle cx="168" cy="188" r="38" fill="#d97706" stroke="#b45309" stroke-width="2"/>
+  <circle cx="168" cy="188" r="16" fill="#f8fafc"/>
+  <circle cx="232" cy="198" r="36" fill="#f59e0b" stroke="#b45309" stroke-width="2"/>
+  <circle cx="232" cy="198" r="14" fill="#f8fafc"/>
+  <circle cx="200" cy="158" r="34" fill="#eab308" stroke="#b45309" stroke-width="2"/>
+  <circle cx="200" cy="158" r="13" fill="#f8fafc"/>
+  <text x="200" y="278" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="600" fill="#64748b">Vada</text>
+</svg>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading - Shanthi Foods</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(248, 250, 252, 0.5), rgba(248, 250, 252, 0.5)), url('/images/background.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .loading-content {
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+      position: relative;
+      z-index: 10000;
+    }
+
+    .logo-container {
+      margin-bottom: 2rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .logo-container img {
+      width: 120px;
+      height: 120px;
+      border-radius: 20px;
+      object-fit: contain;
+      background: #fff;
+      padding: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .loading-text {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 1rem;
+      animation: slideUp 1s ease-out;
+    }
+
+    .loading-subtext {
+      font-size: 1rem;
+      color: #64748b;
+      animation: slideUp 1s ease-out 0.3s both;
+    }
+
+    .loading-dots {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 2rem;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      background: #f97316;
+      border-radius: 50%;
+      animation: bounce 1.4s ease-in-out infinite;
+    }
+
+    .dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    /* Curtain panels for transition */
+    .curtain-left, .curtain-right {
+      position: fixed;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      z-index: 9998;
+      transition: transform 1.5s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    .curtain-left {
+      left: 0;
+      transform: translateX(0);
+    }
+
+    .curtain-right {
+      right: 0;
+      transform: translateX(0);
+    }
+
+    .curtain-left.open {
+      transform: translateX(-100%);
+    }
+
+    .curtain-right.open {
+      transform: translateX(100%);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes bounce {
+      0%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-20px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="curtain-left"></div>
+  <div class="curtain-right"></div>
+  
+  <div class="loading-screen">
+    <div class="loading-content">
+      <div class="logo-container">
+        <img src="/images/logo.png" alt="Shanthi Foods Logo">
+      </div>
+      <div class="loading-text">Welcome to Shanthi Foods</div>
+      <div class="loading-subtext">Loading your experience...</div>
+      <div class="loading-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Trigger curtain animation after 2 seconds
+    setTimeout(() => {
+      const curtainLeft = document.querySelector('.curtain-left');
+      const curtainRight = document.querySelector('.curtain-right');
+      const loadingScreen = document.querySelector('.loading-screen');
+      
+      curtainLeft.classList.add('open');
+      curtainRight.classList.add('open');
+      
+      // Hide loading screen after curtain animation
+      setTimeout(() => {
+        loadingScreen.style.opacity = '0';
+        loadingScreen.style.transition = 'opacity 0.5s ease';
+        
+        // Redirect to home page
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 500);
+      }, 1500);
+    }, 2000);
+  </script>
+</body>
+</html>

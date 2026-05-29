@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#f8fafc"/>
+  <ellipse cx="200" cy="248" rx="95" ry="14" fill="#e2e8f0"/>
+  <ellipse cx="200" cy="238" rx="78" ry="10" fill="#fff" stroke="#e2e8f0" stroke-width="2"/>
+  <circle cx="168" cy="198" r="28" fill="#fffef7" stroke="#fde68a" stroke-width="2"/>
+  <circle cx="200" cy="188" r="30" fill="#fffef7" stroke="#fde68a" stroke-width="2"/>
+  <circle cx="232" cy="198" r="28" fill="#fffef7" stroke="#fde68a" stroke-width="2"/>
+  <circle cx="184" cy="168" r="24" fill="#fffef7" stroke="#fde68a" stroke-width="2"/>
+  <circle cx="216" cy="168" r="24" fill="#fffef7" stroke="#fde68a" stroke-width="2"/>
+  <text x="200" y="278" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="600" fill="#64748b">Idly</text>
+</svg>

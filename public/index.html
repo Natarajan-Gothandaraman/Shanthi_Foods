@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billing — Shanthi Foods</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="/images/logo.png" type="image/png">
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="nav-brand">
+      <img src="/images/logo.png" alt="Shanthi Foods Logo" class="nav-logo">
+      <span class="nav-brand-text">Shanthi Foods</span>
+    </a>
+    <button type="button" class="nav-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
+    <div class="nav-links">
+      <a href="/" class="active">Billing</a>
+      <a href="/admin.html">Manage Menu</a>
+      <a href="/reports.html">Reports</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="pos-layout">
+      <section>
+        <h1 class="page-title">Menu</h1>
+        <div class="menu-grid" id="menu-grid">
+          <p class="cart-empty">Loading menu…</p>
+        </div>
+      </section>
+
+      <aside class="cart-panel">
+        <div class="cart-header">Cart (<span id="cart-count">0</span>)</div>
+        <div class="cart-items" id="cart-items">
+          <p class="cart-empty">Tap a menu item to add</p>
+        </div>
+        <div class="cart-footer">
+          <div class="cart-total-row">
+            <span>Total</span>
+            <span id="cart-total">₹0.00</span>
+          </div>
+          <div class="cart-actions">
+            <button class="btn btn-primary btn-block" id="btn-pay" disabled>Pay (UPI)</button>
+            <button class="btn btn-success btn-block" id="btn-cash" disabled>Cash Payment</button>
+            <button class="btn btn-secondary btn-block" id="btn-print" disabled>Print bill</button>
+            <button class="btn btn-danger btn-block" id="btn-clear" disabled>Clear cart</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="print-area"></div>
+
+  <div class="order-counter" id="order-counter">
+    <span class="counter-label">Today's Orders:</span>
+    <span class="counter-value" id="order-count">0</span>
+  </div>
+
+  <div class="modal-overlay" id="pay-modal">
+    <div class="modal">
+      <h2>Scan to Pay (UPI)</h2>
+      <p class="amount" id="pay-amount">₹0.00</p>
+      <img class="qr-code" id="pay-qr" alt="UPI QR Code">
+      <p class="upi-hint" id="pay-upi-hint"></p>
+      <div class="modal-actions">
+        <button class="btn btn-success btn-block" id="btn-mark-paid">Mark as paid</button>
+        <button class="btn btn-secondary btn-block" id="btn-cancel-pay">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/loading.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/pos.js"></script>
+</body>
+</html>

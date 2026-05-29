@@ -1,0 +1,24 @@
+{
+  "name": "restaurant-billing",
+  "version": "1.0.0",
+  "description": "Restaurant POS billing with menu CRUD and sales reports",
+  "main": "server/index.js",
+  "engines": {
+    "node": ">=18.x"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js",
+    "postinstall": "node scripts/download-images.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "pdfkit": "^0.16.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Menu — Shanthi Foods</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="/images/logo.png" type="image/png">
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="nav-brand">
+      <img src="/images/logo.png" alt="Shanthi Foods Logo" class="nav-logo">
+      <span class="nav-brand-text">Shanthi Foods</span>
+    </a>
+    <button type="button" class="nav-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
+    <div class="nav-links">
+      <a href="/">Billing</a>
+      <a href="/admin.html" class="active">Manage Menu</a>
+      <a href="/reports.html">Reports</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="page-title">Manage Menu</h1>
+
+    <div class="admin-grid">
+      <div class="card">
+        <h2>Menu items</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="menu-table-body">
+              <tr><td colspan="5">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2 id="form-title">Add item</h2>
+          <form id="menu-form">
+            <input type="hidden" id="item-id">
+            <div class="form-group">
+              <label for="item-name">Name</label>
+              <input type="text" id="item-name" required placeholder="e.g. Idly">
+            </div>
+            <div class="form-group">
+              <label for="item-price">Price (₹)</label>
+              <input type="number" id="item-price" required min="0" step="0.01" placeholder="30">
+            </div>
+            <div class="form-group">
+              <label for="item-image">Image</label>
+              <input type="file" id="item-image" accept="image/*">
+            </div>
+            <div class="form-group form-check">
+              <input type="checkbox" id="item-active" checked>
+              <label for="item-active">Active (show on billing)</label>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <button type="button" class="btn btn-secondary" id="btn-cancel-edit" style="display:none">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card settings-section">
+          <h2>Restaurant settings</h2>
+          <form id="settings-form">
+            <div class="form-group">
+              <label for="setting-name">Restaurant name</label>
+              <input type="text" id="setting-name" required>
+            </div>
+            <div class="form-group">
+              <label for="setting-upi">UPI ID</label>
+              <input type="text" id="setting-upi" required placeholder="yourname@upi">
+            </div>
+            <div class="form-group">
+              <label for="setting-payee">UPI payee name</label>
+              <input type="text" id="setting-payee" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Save settings</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/loading.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

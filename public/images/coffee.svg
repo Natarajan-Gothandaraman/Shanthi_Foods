@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#f8fafc"/>
+  <ellipse cx="200" cy="248" rx="95" ry="14" fill="#e2e8f0"/>
+  <path d="M148 210 L148 150 Q148 118 200 118 Q252 118 252 150 L252 210 Z" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+  <ellipse cx="200" cy="118" rx="52" ry="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+  <path d="M252 165 L278 158 Q288 175 278 195 L252 200 Z" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+  <rect x="168" y="145" width="64" height="50" rx="4" fill="#78350f"/>
+  <path d="M185 108 Q190 88 195 108" fill="none" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+  <path d="M200 100 Q205 75 210 100" fill="none" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+  <path d="M215 108 Q220 88 225 108" fill="none" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+  <text x="200" y="278" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="600" fill="#64748b">Coffee</text>
+</svg>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Reports — Shanthi Foods</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="/images/logo.png" type="image/png">
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="nav-brand">
+      <img src="/images/logo.png" alt="Shanthi Foods Logo" class="nav-logo">
+      <span class="nav-brand-text">Shanthi Foods</span>
+    </a>
+    <button type="button" class="nav-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
+    <div class="nav-links">
+      <a href="/">Billing</a>
+      <a href="/admin.html">Manage Menu</a>
+      <a href="/reports.html" class="active">Reports</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="page-title">Sales Reports</h1>
+
+    <div class="card report-filters">
+      <div class="filter-presets">
+        <button type="button" class="btn btn-secondary" id="btn-this-month">This month</button>
+        <button type="button" class="btn btn-secondary" id="btn-last-month">Last month</button>
+      </div>
+      <div class="form-group">
+        <label for="date-from">From</label>
+        <input type="date" id="date-from">
+      </div>
+      <div class="form-group">
+        <label for="date-to">To</label>
+        <input type="date" id="date-to">
+      </div>
+      <button type="button" class="btn btn-primary" id="btn-run-report">Run report</button>
+      <button type="button" class="btn btn-success" id="btn-download-pdf" disabled>Download PDF</button>
+    </div>
+
+    <div class="summary-cards" id="summary-cards" style="display:none">
+      <div class="summary-card">
+        <div class="label">Total orders</div>
+        <div class="value" id="stat-orders">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Gross sales</div>
+        <div class="value" id="stat-sales">₹0</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Period</div>
+        <div class="value value-sm" id="stat-period">—</div>
+      </div>
+    </div>
+
+    <div class="card report-section" id="daily-card" style="display:none">
+      <h2>Sales by date</h2>
+      <div class="table-wrap">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Orders</th>
+              <th>Revenue</th>
+            </tr>
+          </thead>
+          <tbody id="daily-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card report-section" id="orders-card" style="display:none">
+      <h2>Orders list (date-wise)</h2>
+      <div id="orders-by-date"></div>
+    </div>
+
+    <div class="card report-section" id="breakdown-card" style="display:none">
+      <h2>Item-wise breakdown</h2>
+      <div class="table-wrap">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Qty sold</th>
+              <th>Revenue</th>
+            </tr>
+          </thead>
+          <tbody id="breakdown-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/loading.js"></script>
+  <script src="/js/reports.js"></script>
+</body>
+</html>

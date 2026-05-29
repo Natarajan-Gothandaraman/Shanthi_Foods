@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#f8fafc"/>
+  <ellipse cx="200" cy="248" rx="95" ry="14" fill="#e2e8f0"/>
+  <rect x="158" y="118" width="84" height="118" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <rect x="168" y="128" width="64" height="12" rx="3" fill="#fde68a" opacity="0.8"/>
+  <rect x="168" y="148" width="64" height="12" rx="3" fill="#fde68a" opacity="0.6"/>
+  <rect x="168" y="168" width="64" height="12" rx="3" fill="#fde68a" opacity="0.8"/>
+  <rect x="168" y="188" width="64" height="12" rx="3" fill="#fde68a" opacity="0.6"/>
+  <ellipse cx="200" cy="118" rx="42" ry="10" fill="#d97706"/>
+  <circle cx="200" cy="108" r="8" fill="#22c55e"/>
+  <text x="200" y="278" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="600" fill="#64748b">Puttu</text>
+</svg>
