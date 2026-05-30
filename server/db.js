@@ -126,6 +126,7 @@ const SEED_ITEMS = [
   { name: 'Egg Noodles', price: 120, image_url: '/images/egg_noodles.jpg' },
   { name: 'Pongal', price: 50, image_url: '/images/pongal.jpg' },
   { name: 'Samosa', price: 15, image_url: '/uploads/menu-1780073921755.jfif' },
+  { name: 'Rava Kesari', price: 40, image_url: '/images/rava-kesari.jpg' },
 ];
 
 const MENU_IMAGE_MAP = {
@@ -142,6 +143,7 @@ const MENU_IMAGE_MAP = {
   'Egg Noodles': '/images/egg_noodles.jpg',
   Pongal: '/images/pongal.jpg',
   Samosa: '/uploads/menu-1780073921755.jfif',
+  'Rava Kesari': '/images/rava-kesari.jpg',
 };
 
 async function initDb() {
