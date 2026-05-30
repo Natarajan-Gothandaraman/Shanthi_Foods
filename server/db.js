@@ -125,7 +125,7 @@ const SEED_ITEMS = [
   { name: 'Mushroom Fried Rice', price: 100, image_url: '/images/mushroom_fried_rice.jpg' },
   { name: 'Egg Noodles', price: 120, image_url: '/images/egg_noodles.jpg' },
   { name: 'Pongal', price: 50, image_url: '/images/pongal.jpg' },
-  { name: 'Samosa', price: 15, image_url: '/images/samosa.jpg' },
+  { name: 'Samosa', price: 15, image_url: '/uploads/menu-1780073921755.jfif' },
 ];
 
 const MENU_IMAGE_MAP = {
@@ -141,7 +141,7 @@ const MENU_IMAGE_MAP = {
   'Mushroom Fried Rice': '/images/mushroom_fried_rice.jpg',
   'Egg Noodles': '/images/egg_noodles.jpg',
   Pongal: '/images/pongal.jpg',
-  Samosa: '/images/samosa.jpg',
+  Samosa: '/uploads/menu-1780073921755.jfif',
 };
 
 async function initDb() {
