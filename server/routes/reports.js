@@ -11,8 +11,8 @@ function parseDateRange(from, to) {
   return { fromDate, toDate, from, to };
 }
 
-function getSalesData(fromDate, toDate) {
-  const summary = db
+async function getSalesData(fromDate, toDate) {
+  const summary = await db
     .prepare(
       `SELECT COUNT(*) AS totalOrders, COALESCE(SUM(total), 0) AS grossSales
        FROM orders
@@ -22,7 +22,7 @@ function getSalesData(fromDate, toDate) {
     )
     .get(fromDate, toDate);
 
-  const itemBreakdown = db
+  const itemBreakdown = await db
     .prepare(
       `SELECT oi.name AS name,
               SUM(oi.qty) AS qty,
@@ -37,7 +37,7 @@ function getSalesData(fromDate, toDate) {
     )
     .all(fromDate, toDate);
 
-  const dailyBreakdown = db
+  const dailyBreakdown = await db
     .prepare(
       `SELECT date(created_at) AS saleDate,
               COUNT(*) AS orderCount,
@@ -51,7 +51,7 @@ function getSalesData(fromDate, toDate) {
     )
     .all(fromDate, toDate);
 
-  const orders = db
+  const orders = await db
     .prepare(
       `SELECT id, total, created_at, payment_mode
        FROM orders
@@ -66,19 +66,19 @@ function getSalesData(fromDate, toDate) {
     `SELECT name, qty, line_total FROM order_items WHERE order_id = ?`
   );
 
-  const ordersList = orders.map((order) => ({
+  const ordersList = await Promise.all(orders.map(async (order) => ({
     id: order.id,
     total: order.total,
     createdAt: order.created_at,
     saleDate: order.created_at.slice(0, 10),
     time: order.created_at.slice(11, 16),
     paymentMode: order.payment_mode || 'cash',
-    items: getOrderItems.all(order.id).map((i) => ({
+    items: (await getOrderItems.all(order.id)).map((i) => ({
       name: i.name,
       qty: i.qty,
       lineTotal: i.line_total,
     })),
-  }));
+  })));
 
   return {
     summary: {
@@ -122,13 +122,13 @@ function resolveRange(req) {
   return range;
 }
 
-router.get('/sales', (req, res) => {
+router.get('/sales', async (req, res) => {
   const range = resolveRange(req);
   if (!range) {
     return res.status(400).json({ error: 'Provide from & to dates or a preset' });
   }
 
-  const data = getSalesData(range.fromDate, range.toDate);
+  const data = await getSalesData(range.fromDate, range.toDate);
   res.json({
     from: range.from,
     to: range.to,
@@ -142,8 +142,8 @@ router.get('/sales.pdf', async (req, res) => {
     return res.status(400).json({ error: 'Provide from & to dates or a preset' });
   }
 
-  const settings = db.prepare('SELECT * FROM settings WHERE id = 1').get();
-  const data = getSalesData(range.fromDate, range.toDate);
+  const settings = await db.prepare('SELECT * FROM settings WHERE id = 1').get();
+  const data = await getSalesData(range.fromDate, range.toDate);
 
   try {
     const pdfBuffer = await buildSalesPdf({

@@ -4,7 +4,7 @@ const db = require('../db');
 
 const router = express.Router();
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const { items, markPaid, paymentMode } = req.body;
   if (!Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ error: 'Cart is empty' });
@@ -15,7 +15,7 @@ router.post('/', (req, res) => {
   let total = 0;
 
   for (const line of items) {
-    const menuItem = getMenuItem.get(line.menuItemId);
+    const menuItem = await getMenuItem.get(line.menuItemId);
     if (!menuItem) {
       return res.status(400).json({ error: `Invalid menu item: ${line.menuItemId}` });
     }
@@ -36,8 +36,8 @@ router.post('/', (req, res) => {
   const paidAt = paid ? new Date().toISOString() : null;
   const mode = paymentMode || (paid ? 'cash' : null);
 
-  const createOrder = db.transaction(() => {
-    const orderResult = db
+  const createOrder = async () => {
+    const orderResult = await db
       .prepare(`INSERT INTO orders (total, payment_status, payment_mode, paid_at) VALUES (?, ?, ?, ?)`)
       .run(total, paymentStatus, mode, paidAt);
     const orderId = orderResult.lastInsertRowid;
@@ -46,7 +46,7 @@ router.post('/', (req, res) => {
        VALUES (?, ?, ?, ?, ?, ?)`
     );
     for (const line of orderLines) {
-      insertLine.run(
+      await insertLine.run(
         orderId,
         line.menu_item_id,
         line.name,
@@ -56,20 +56,20 @@ router.post('/', (req, res) => {
       );
     }
     return orderId;
-  });
+  };
 
-  const orderId = createOrder();
-  const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(orderId);
-  const orderItems = db
+  const orderId = await createOrder();
+  const order = await db.prepare('SELECT * FROM orders WHERE id = ?').get(orderId);
+  const orderItems = await db
     .prepare('SELECT * FROM order_items WHERE order_id = ?')
     .all(orderId);
 
   res.status(201).json({ order, items: orderItems });
 });
 
-router.get('/count/today', (req, res) => {
+router.get('/count/today', async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
-  const count = db
+  const count = await db
     .prepare('SELECT COUNT(*) AS count FROM orders WHERE DATE(created_at) = ?')
     .get(today);
   res.json({ count: count.count });
@@ -82,7 +82,7 @@ router.post('/qr', async (req, res) => {
     return res.status(400).json({ error: 'Invalid amount' });
   }
 
-  const settings = db.prepare('SELECT * FROM settings WHERE id = 1').get();
+  const settings = await db.prepare('SELECT * FROM settings WHERE id = 1').get();
   const upiString = `upi://pay?pa=${encodeURIComponent(settings.upi_id)}&pn=${encodeURIComponent(settings.upi_payee_name)}&am=${total.toFixed(2)}&cu=INR`;
 
   try {

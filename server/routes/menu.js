@@ -28,39 +28,39 @@ const upload = multer({
   },
 });
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   const activeOnly = req.query.active === '1';
   let sql = 'SELECT * FROM menu_items';
   if (activeOnly) sql += ' WHERE is_active = 1';
   sql += ' ORDER BY name ASC';
-  const items = db.prepare(sql).all();
+  const items = await db.prepare(sql).all();
   res.json(items);
 });
 
-router.get('/:id', (req, res) => {
-  const item = db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
+router.get('/:id', async (req, res) => {
+  const item = await db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
   if (!item) return res.status(404).json({ error: 'Menu item not found' });
   res.json(item);
 });
 
-router.post('/', upload.single('image'), (req, res) => {
+router.post('/', upload.single('image'), async (req, res) => {
   const { name, price, is_active } = req.body;
   if (!name || price === undefined) {
     return res.status(400).json({ error: 'Name and price are required' });
   }
   const imageUrl = req.file ? `/uploads/${req.file.filename}` : req.body.image_url || '';
   const active = is_active === '0' || is_active === 'false' ? 0 : 1;
-  const result = db
+  const result = await db
     .prepare(
       `INSERT INTO menu_items (name, price, image_url, is_active) VALUES (?, ?, ?, ?)`
     )
     .run(name.trim(), parseFloat(price), imageUrl, active);
-  const item = db.prepare('SELECT * FROM menu_items WHERE id = ?').get(result.lastInsertRowid);
+  const item = await db.prepare('SELECT * FROM menu_items WHERE id = ?').get(result.lastInsertRowid);
   res.status(201).json(item);
 });
 
-router.put('/:id', upload.single('image'), (req, res) => {
-  const existing = db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
+router.put('/:id', upload.single('image'), async (req, res) => {
+  const existing = await db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
   if (!existing) return res.status(404).json({ error: 'Menu item not found' });
 
   const name = req.body.name !== undefined ? req.body.name.trim() : existing.name;
@@ -82,16 +82,16 @@ router.put('/:id', upload.single('image'), (req, res) => {
     imageUrl = req.body.image_url;
   }
 
-  db.prepare(
+  await db.prepare(
     `UPDATE menu_items SET name = ?, price = ?, image_url = ?, is_active = ? WHERE id = ?`
   ).run(name, price, imageUrl, active, req.params.id);
 
-  const item = db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
+  const item = await db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
   res.json(item);
 });
 
-router.delete('/:id', (req, res) => {
-  const existing = db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
+router.delete('/:id', async (req, res) => {
+  const existing = await db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
   if (!existing) return res.status(404).json({ error: 'Menu item not found' });
 
   if (existing.image_url && existing.image_url.startsWith('/uploads/')) {
@@ -99,7 +99,7 @@ router.delete('/:id', (req, res) => {
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
   }
 
-  db.prepare('DELETE FROM menu_items WHERE id = ?').run(req.params.id);
+  await db.prepare('DELETE FROM menu_items WHERE id = ?').run(req.params.id);
   res.json({ success: true });
 });
 
