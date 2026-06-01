@@ -30,6 +30,8 @@ if (usePostgres) {
             let finalSql = pgSql.replace(/AUTOINCREMENT/g, '').replace(/INTEGER PRIMARY KEY/g, 'SERIAL PRIMARY KEY');
             // Convert datetime function
             finalSql = finalSql.replace(/datetime\('now','\+5 hours','30 minutes'\)/g, "NOW() + INTERVAL '5 hours 30 minutes'");
+            // Convert datetime(column) to just column (PostgreSQL doesn't need datetime wrapper)
+            finalSql = finalSql.replace(/datetime\(([^)]+)\)/g, '$1');
             
             const result = await client.query(finalSql, params);
             return { lastInsertRowid: result.rows[0]?.id || result.insertId };
@@ -41,6 +43,8 @@ if (usePostgres) {
           const client = await pool.connect();
           try {
             let finalSql = pgSql.replace(/datetime\('now','\+5 hours','30 minutes'\)/g, "NOW() + INTERVAL '5 hours 30 minutes'");
+            // Convert datetime(column) to just column (PostgreSQL doesn't need datetime wrapper)
+            finalSql = finalSql.replace(/datetime\(([^)]+)\)/g, '$1');
             const result = await client.query(finalSql, params);
             return result.rows[0];
           } finally {
@@ -51,6 +55,8 @@ if (usePostgres) {
           const client = await pool.connect();
           try {
             let finalSql = pgSql.replace(/datetime\('now','\+5 hours','30 minutes'\)/g, "NOW() + INTERVAL '5 hours 30 minutes'");
+            // Convert datetime(column) to just column (PostgreSQL doesn't need datetime wrapper)
+            finalSql = finalSql.replace(/datetime\(([^)]+)\)/g, '$1');
             const result = await client.query(finalSql, params);
             return result.rows;
           } finally {

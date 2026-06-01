@@ -183,6 +183,10 @@ router.post('/qr', async (req, res) => {
   }
 
   const settings = await db.prepare('SELECT * FROM settings WHERE id = 1').get();
+  if (!settings) {
+    return res.status(500).json({ error: 'Settings not found' });
+  }
+  
   const upiString = `upi://pay?pa=${encodeURIComponent(settings.upi_id)}&pn=${encodeURIComponent(settings.upi_payee_name)}&am=${total.toFixed(2)}&cu=INR`;
 
   try {
