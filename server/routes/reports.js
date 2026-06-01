@@ -66,19 +66,22 @@ async function getSalesData(fromDate, toDate) {
     `SELECT name, qty, line_total FROM order_items WHERE order_id = ?`
   );
 
-  const ordersList = await Promise.all(orders.map(async (order) => ({
-    id: order.id,
-    total: order.total,
-    createdAt: order.created_at,
-    saleDate: order.created_at.slice(0, 10),
-    time: order.created_at.slice(11, 16),
-    paymentMode: order.payment_mode || 'cash',
-    items: (await getOrderItems.all(order.id)).map((i) => ({
-      name: i.name,
-      qty: i.qty,
-      lineTotal: i.line_total,
-    })),
-  })));
+  const ordersList = await Promise.all(orders.map(async (order) => {
+    const createdAt = order.created_at instanceof Date ? order.created_at.toISOString() : order.created_at;
+    return {
+      id: order.id,
+      total: order.total,
+      createdAt: createdAt,
+      saleDate: createdAt.slice(0, 10),
+      time: createdAt.slice(11, 16),
+      paymentMode: order.payment_mode || 'cash',
+      items: (await getOrderItems.all(order.id)).map((i) => ({
+        name: i.name,
+        qty: i.qty,
+        lineTotal: i.line_total,
+      })),
+    };
+  }));
 
   return {
     summary: {
