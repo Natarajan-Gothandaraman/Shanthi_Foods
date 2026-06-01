@@ -6,8 +6,9 @@ const router = express.Router();
 
 function parseDateRange(from, to) {
   if (!from || !to) return null;
-  const fromDate = `${from} 00:00:00`;
-  const toDate = `${to} 23:59:59`;
+  // Convert to ISO format for PostgreSQL
+  const fromDate = new Date(from + 'T00:00:00').toISOString();
+  const toDate = new Date(to + 'T23:59:59').toISOString();
   return { fromDate, toDate, from, to };
 }
 
@@ -18,8 +19,8 @@ async function getSalesData(fromDate, toDate) {
         `SELECT COUNT(*) AS totalOrders, COALESCE(SUM(total), 0) AS grossSales
          FROM orders
          WHERE payment_status = 'paid'
-           AND datetime(created_at) >= datetime(?)
-           AND datetime(created_at) <= datetime(?)`
+           AND created_at >= ?
+           AND created_at <= ?`
       )
       .get(fromDate, toDate);
 
@@ -31,8 +32,8 @@ async function getSalesData(fromDate, toDate) {
          FROM order_items oi
          JOIN orders o ON o.id = oi.order_id
          WHERE o.payment_status = 'paid'
-           AND datetime(o.created_at) >= datetime(?)
-           AND datetime(o.created_at) <= datetime(?)
+           AND o.created_at >= ?
+           AND o.created_at <= ?
          GROUP BY oi.name
          ORDER BY revenue DESC`
       )
@@ -40,14 +41,14 @@ async function getSalesData(fromDate, toDate) {
 
     const dailyBreakdown = await db
       .prepare(
-        `SELECT date(created_at) AS saleDate,
+        `SELECT DATE(created_at) AS saleDate,
                 COUNT(*) AS orderCount,
                 COALESCE(SUM(total), 0) AS revenue
          FROM orders
          WHERE payment_status = 'paid'
-           AND datetime(created_at) >= datetime(?)
-           AND datetime(created_at) <= datetime(?)
-         GROUP BY date(created_at)
+           AND created_at >= ?
+           AND created_at <= ?
+         GROUP BY DATE(created_at)
          ORDER BY saleDate DESC`
       )
       .all(fromDate, toDate);
@@ -57,9 +58,9 @@ async function getSalesData(fromDate, toDate) {
         `SELECT id, total, created_at, payment_mode
          FROM orders
          WHERE payment_status = 'paid'
-           AND datetime(created_at) >= datetime(?)
-           AND datetime(created_at) <= datetime(?)
-         ORDER BY datetime(created_at) DESC`
+           AND created_at >= ?
+           AND created_at <= ?
+         ORDER BY created_at DESC`
       )
       .all(fromDate, toDate);
 
@@ -160,7 +161,7 @@ router.get('/sales.pdf', async (req, res) => {
 
     try {
       const pdfBuffer = await buildSalesPdf({
-        restaurantName: settings.restaurant_name,
+        restaurantName: settings.restaurant_name || 'Restaurant',
         from: range.from,
         to: range.to,
         summary: data.summary,
@@ -176,11 +177,11 @@ router.get('/sales.pdf', async (req, res) => {
       res.send(pdfBuffer);
     } catch (err) {
       console.error('Error generating PDF:', err);
-      res.status(500).json({ error: 'Failed to generate PDF' });
+      res.status(500).json({ error: 'Failed to generate PDF: ' + err.message });
     }
   } catch (err) {
     console.error('Error in sales PDF route:', err);
-    res.status(500).json({ error: 'Failed to generate sales report' });
+    res.status(500).json({ error: 'Failed to generate sales report: ' + err.message });
   }
 });
 

@@ -92,17 +92,19 @@ document.getElementById('menu-form').addEventListener('submit', async (e) => {
   if (imageFile) formData.append('image', imageFile);
 
   try {
+    let result;
     if (editingId) {
-      await Api.updateMenuItem(editingId, formData);
-      showToast('Item updated', 'success');
+      result = await Api.updateMenuItem(editingId, formData);
+      showToast('Item updated successfully', 'success');
     } else {
-      await Api.createMenuItem(formData);
-      showToast('Item added', 'success');
+      result = await Api.createMenuItem(formData);
+      showToast('Item added successfully', 'success');
     }
     resetForm();
     loadMenuTable();
   } catch (err) {
-    showToast(err.message, 'error');
+    console.error('Error saving menu item:', err);
+    showToast(err.message || 'Failed to save item', 'error');
   }
 });
 

@@ -220,8 +220,8 @@ document.getElementById('btn-cash').addEventListener('click', async () => {
     Cart.clear();
     loadOrderCount();
     showToast(`Order #${result.order.id} paid by cash`, 'success');
-    // Auto print without confirmation
-    setTimeout(() => window.print(), 500);
+    // Print directly without delay
+    window.print();
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -250,8 +250,8 @@ document.getElementById('btn-mark-paid').addEventListener('click', async () => {
     closePayModal();
     loadOrderCount();
     showToast(`Order #${result.order.id} paid successfully`, 'success');
-    // Auto print without confirmation
-    setTimeout(() => window.print(), 500);
+    // Print directly without delay
+    window.print();
   } catch (err) {
     showToast(err.message, 'error');
   }
