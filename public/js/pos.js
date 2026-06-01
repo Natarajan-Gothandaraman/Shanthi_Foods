@@ -220,9 +220,8 @@ document.getElementById('btn-cash').addEventListener('click', async () => {
     Cart.clear();
     loadOrderCount();
     showToast(`Order #${result.order.id} paid by cash`, 'success');
-    if (confirm('Payment recorded. Print bill now?')) {
-      window.print();
-    }
+    // Auto print without confirmation
+    setTimeout(() => window.print(), 500);
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -251,9 +250,8 @@ document.getElementById('btn-mark-paid').addEventListener('click', async () => {
     closePayModal();
     loadOrderCount();
     showToast(`Order #${result.order.id} paid successfully`, 'success');
-    if (confirm('Payment recorded. Print bill now?')) {
-      window.print();
-    }
+    // Auto print without confirmation
+    setTimeout(() => window.print(), 500);
   } catch (err) {
     showToast(err.message, 'error');
   }
