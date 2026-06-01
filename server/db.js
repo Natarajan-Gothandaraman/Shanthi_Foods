@@ -80,7 +80,14 @@ if (usePostgres) {
   };
 } else {
   // SQLite (local development)
-  const Database = require('better-sqlite3');
+  let Database;
+  try {
+    Database = require('better-sqlite3');
+  } catch (err) {
+    console.error('better-sqlite3 not installed. Please install it for local development: npm install better-sqlite3');
+    process.exit(1);
+  }
+  
   const dataDir = process.env.DATA_DIR || path.join(__dirname, '..', 'data');
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
