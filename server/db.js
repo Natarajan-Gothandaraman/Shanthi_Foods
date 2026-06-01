@@ -18,16 +18,20 @@ if (usePostgres) {
   // Create a simple wrapper that mimics SQLite's prepare/run/get/all API
   db = {
     prepare: (sql) => {
+      // Convert SQLite ? parameters to PostgreSQL $1, $2, etc.
+      let paramIndex = 0;
+      const pgSql = sql.replace(/\?/g, () => `$${++paramIndex}`);
+      
       return {
         run: async (...params) => {
           const client = await pool.connect();
           try {
             // Convert SQLite INSERT to PostgreSQL
-            let pgSql = sql.replace(/AUTOINCREMENT/g, '').replace(/INTEGER PRIMARY KEY/g, 'SERIAL PRIMARY KEY');
+            let finalSql = pgSql.replace(/AUTOINCREMENT/g, '').replace(/INTEGER PRIMARY KEY/g, 'SERIAL PRIMARY KEY');
             // Convert datetime function
-            pgSql = pgSql.replace(/datetime\('now','\+5 hours','30 minutes'\)/g, "NOW() + INTERVAL '5 hours 30 minutes'");
+            finalSql = finalSql.replace(/datetime\('now','\+5 hours','30 minutes'\)/g, "NOW() + INTERVAL '5 hours 30 minutes'");
             
-            const result = await client.query(pgSql, params);
+            const result = await client.query(finalSql, params);
             return { lastInsertRowid: result.rows[0]?.id || result.insertId };
           } finally {
             client.release();
@@ -36,8 +40,8 @@ if (usePostgres) {
         get: async (...params) => {
           const client = await pool.connect();
           try {
-            let pgSql = sql.replace(/datetime\('now','\+5 hours','30 minutes'\)/g, "NOW() + INTERVAL '5 hours 30 minutes'");
-            const result = await client.query(pgSql, params);
+            let finalSql = pgSql.replace(/datetime\('now','\+5 hours','30 minutes'\)/g, "NOW() + INTERVAL '5 hours 30 minutes'");
+            const result = await client.query(finalSql, params);
             return result.rows[0];
           } finally {
             client.release();
@@ -46,8 +50,8 @@ if (usePostgres) {
         all: async (...params) => {
           const client = await pool.connect();
           try {
-            let pgSql = sql.replace(/datetime\('now','\+5 hours','30 minutes'\)/g, "NOW() + INTERVAL '5 hours 30 minutes'");
-            const result = await client.query(pgSql, params);
+            let finalSql = pgSql.replace(/datetime\('now','\+5 hours','30 minutes'\)/g, "NOW() + INTERVAL '5 hours 30 minutes'");
+            const result = await client.query(finalSql, params);
             return result.rows;
           } finally {
             client.release();
