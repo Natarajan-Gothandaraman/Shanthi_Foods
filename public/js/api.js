@@ -67,6 +67,23 @@ const Api = {
   getTodayOrderCount() {
     return apiFetch('/orders/count/today');
   },
+  getOrder(id) {
+    return apiFetch(`/orders/${id}`);
+  },
+  getOrders(params) {
+    const qs = new URLSearchParams(params).toString();
+    return apiFetch(`/orders${qs ? '?' + qs : ''}`);
+  },
+  updateOrder(id, payload) {
+    return apiFetch(`/orders/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  },
+  deleteOrder(id) {
+    return apiFetch(`/orders/${id}`, { method: 'DELETE' });
+  },
 };
 
 function formatINR(amount) {

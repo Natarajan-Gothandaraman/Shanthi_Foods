@@ -1,5 +1,6 @@
 let settings = {};
 let lastOrder = null;
+let allMenuItems = [];
 
 async function loadSettings() {
   settings = await Api.getSettings();
@@ -18,34 +19,52 @@ async function loadMenu() {
   const grid = document.getElementById('menu-grid');
   try {
     const items = await Api.getMenu(true);
-    if (items.length === 0) {
-      grid.innerHTML = '<p class="cart-empty">No active menu items. Add items in Manage Menu.</p>';
-      return;
-    }
-    grid.innerHTML = items
-      .map(
-        (item) => `
-      <div class="menu-card" data-id="${item.id}" role="button" tabindex="0">
-        <img src="${item.image_url || '/images/idly.jpg'}" alt="${item.name}" onerror="this.onerror=null;this.src='/images/${escapeHtml(item.name.toLowerCase())}.jpg'">
-        <div class="menu-card-body">
-          <h3>${escapeHtml(item.name)}</h3>
-          <span class="price">${formatINR(item.price)}</span>
-        </div>
-      </div>`
-      )
-      .join('');
-
-    grid.querySelectorAll('.menu-card').forEach((card) => {
-      const id = parseInt(card.dataset.id, 10);
-      const item = items.find((i) => i.id === id);
-      card.addEventListener('click', () => {
-        Cart.add(item);
-        showToast(`Added ${item.name}`, 'success');
-      });
-    });
+    allMenuItems = items;
+    renderMenu(items);
   } catch (err) {
     grid.innerHTML = `<p class="cart-empty">${err.message}</p>`;
   }
+}
+
+function renderMenu(items) {
+  const grid = document.getElementById('menu-grid');
+  if (items.length === 0) {
+    grid.innerHTML = '<p class="cart-empty">No menu items found.</p>';
+    return;
+  }
+  grid.innerHTML = items
+    .map(
+      (item) => `
+    <div class="menu-card" data-id="${item.id}" role="button" tabindex="0">
+      <img src="${item.image_url || '/images/idly.jpg'}" alt="${item.name}" loading="lazy" onerror="this.onerror=null;this.src='/images/${escapeHtml(item.name.toLowerCase())}.jpg'">
+      <div class="menu-card-body">
+        <h3>${escapeHtml(item.name)}</h3>
+        <span class="price">${formatINR(item.price)}</span>
+      </div>
+    </div>`
+    )
+    .join('');
+
+  grid.querySelectorAll('.menu-card').forEach((card) => {
+    const id = parseInt(card.dataset.id, 10);
+    const item = allMenuItems.find((i) => i.id === id);
+    card.addEventListener('click', () => {
+      Cart.add(item);
+      showToast(`Added ${item.name}`, 'success');
+    });
+  });
+}
+
+function filterMenu(searchTerm) {
+  const term = searchTerm.toLowerCase().trim();
+  if (!term) {
+    renderMenu(allMenuItems);
+    return;
+  }
+  const filtered = allMenuItems.filter(item => 
+    item.name.toLowerCase().includes(term)
+  );
+  renderMenu(filtered);
 }
 
 function escapeHtml(str) {
@@ -258,6 +277,10 @@ document.getElementById('btn-clear').addEventListener('click', () => {
     Cart.clear();
     showToast('Cart cleared');
   }
+});
+
+document.getElementById('menu-search').addEventListener('input', (e) => {
+  filterMenu(e.target.value);
 });
 
 Cart.subscribe(renderCart);

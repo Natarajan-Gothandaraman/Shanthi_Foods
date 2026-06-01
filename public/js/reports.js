@@ -1,4 +1,76 @@
 let currentParams = null;
+let settings = {};
+
+async function loadSettings() {
+  settings = await Api.getSettings();
+}
+
+function formatINR(amount) {
+  return '₹' + parseFloat(amount).toFixed(2);
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function renderPrintPreview(snapshot, orderMeta = null) {
+  let printArea = document.getElementById('print-area');
+  if (!printArea) {
+    printArea = document.createElement('div');
+    printArea.id = 'print-area';
+    document.body.appendChild(printArea);
+  }
+  
+  if (!snapshot.lines.length && !orderMeta) {
+    printArea.innerHTML = '';
+    return;
+  }
+
+  const now = new Date();
+  const dateStr = now.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+  const orderLabel = orderMeta ? `Order #${orderMeta.orderId}` : 'Preview (not paid)';
+  const paymentModeLabel = orderMeta && orderMeta.paymentMode ? `Paid via: ${orderMeta.paymentMode.toUpperCase()}` : '';
+
+  const rows = snapshot.lines.map(l => `
+    <tr>
+      <td>${escapeHtml(l.name)}</td>
+      <td style="text-align:center">${l.qty}</td>
+      <td style="text-align:right">${formatINR(l.lineTotal)}</td>
+    </tr>`
+  ).join('');
+
+  printArea.innerHTML = `
+    <div class="receipt">
+      <h1>${escapeHtml(settings.restaurant_name || 'Restaurant')}</h1>
+      <div class="meta">${dateStr}<br>${orderLabel}</div>
+      <table>
+        <thead>
+          <tr>
+            <td><strong>Item</strong></td>
+            <td style="text-align:center"><strong>Qty</strong></td>
+            <td style="text-align:right"><strong>Amt</strong></td>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="total-row">
+        <span>Total</span>
+        <span>${formatINR(snapshot.total)}</span>
+      </div>
+      ${paymentModeLabel ? `<div class="payment-mode">${paymentModeLabel}</div>` : ''}
+      <p class="thanks">Thank you! Visit again.</p>
+    </div>`;
+}
 
 function escapeHtml(str) {
   const div = document.createElement('div');
@@ -104,7 +176,7 @@ function renderReport(data) {
       const ordersHtml = dayOrders
         .map(
           (o) => `
-        <div class="order-row">
+        <div class="order-row" data-order-id="${o.id}">
           <div class="order-row-head">
             <span class="order-id">#${o.id}</span>
             <span class="order-time">${formatTime(o.time)}</span>
@@ -188,6 +260,7 @@ document.getElementById('btn-download-pdf').addEventListener('click', () => {
 });
 
 initNav();
+loadSettings();
 const defaultRange = getThisMonthRange();
 document.getElementById('date-from').value = defaultRange.from;
 document.getElementById('date-to').value = defaultRange.to;

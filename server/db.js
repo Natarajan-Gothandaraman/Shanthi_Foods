@@ -1,16 +1,15 @@
-const Database = require('better-sqlite3');
 const { Pool } = require('pg');
 const path = require('path');
 const fs = require('fs');
 
-// Use PostgreSQL if DATABASE_URL is set (for Vercel/Supabase), otherwise use SQLite
+// Use PostgreSQL if DATABASE_URL is set (for Render), otherwise use SQLite
 const usePostgres = process.env.DATABASE_URL ? true : false;
 
 let db;
 let pool;
 
 if (usePostgres) {
-  // PostgreSQL (Supabase) connection
+  // PostgreSQL (Render) connection
   pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.DATABASE_URL.includes('localhost') ? false : { rejectUnauthorized: false }
@@ -77,6 +76,7 @@ if (usePostgres) {
   };
 } else {
   // SQLite (local development)
+  const Database = require('better-sqlite3');
   const dataDir = process.env.DATA_DIR || path.join(__dirname, '..', 'data');
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
@@ -114,7 +114,7 @@ function restoreDatabase(backupPath) {
 
 const SEED_ITEMS = [
   { name: 'Idly', price: 30, image_url: '/images/idly.jpg' },
-  { name: 'Puttu', price: 40, image_url: '/images/puttu.jpg' },
+  { name: 'Puttu', price: 40, image_url: '/images/PUTTU.jpg' },
   { name: 'Poori', price: 45, image_url: '/images/poori.jpg' },
   { name: 'Coffee', price: 20, image_url: '/images/coffee.jpg' },
   { name: 'Dosai', price: 50, image_url: '/images/dosai.jpg' },
@@ -125,13 +125,13 @@ const SEED_ITEMS = [
   { name: 'Mushroom Fried Rice', price: 100, image_url: '/images/mushroom_fried_rice.jpg' },
   { name: 'Egg Noodles', price: 120, image_url: '/images/egg_noodles.jpg' },
   { name: 'Pongal', price: 50, image_url: '/images/pongal.jpg' },
-  { name: 'Samosa', price: 15, image_url: '/uploads/menu-1780073921755.jfif' },
-  { name: 'Rava Kesari', price: 40, image_url: '/images/rava-kesari.jpg' },
+  { name: 'Samosa', price: 15, image_url: '/images/samosa.jpg' },
+  { name: 'Rava Kesari', price: 40, image_url: '/images/RavaKesari.jpg' },
 ];
 
 const MENU_IMAGE_MAP = {
   Idly: '/images/idly.jpg',
-  Puttu: '/images/puttu.jpg',
+  Puttu: '/images/PUTTU.jpg',
   Poori: '/images/poori.jpg',
   Coffee: '/images/coffee.jpg',
   Dosai: '/images/dosai.jpg',
@@ -142,48 +142,90 @@ const MENU_IMAGE_MAP = {
   'Mushroom Fried Rice': '/images/mushroom_fried_rice.jpg',
   'Egg Noodles': '/images/egg_noodles.jpg',
   Pongal: '/images/pongal.jpg',
-  Samosa: '/uploads/menu-1780073921755.jfif',
-  'Rava Kesari': '/images/rava-kesari.jpg',
+  Samosa: '/images/samosa.jpg',
+  'Rava Kesari': '/images/RavaKesari.jpg',
 };
 
 async function initDb() {
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS menu_items (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      price REAL NOT NULL,
-      image_url TEXT DEFAULT '',
-      is_active INTEGER NOT NULL DEFAULT 1,
-      created_at TEXT NOT NULL DEFAULT (datetime('now','+5 hours','30 minutes'))
-    );
+  if (usePostgres) {
+    // PostgreSQL schema
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS menu_items (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        price REAL NOT NULL,
+        image_url TEXT DEFAULT '',
+        is_active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT (NOW() + INTERVAL '5 hours 30 minutes')
+      );
 
-    CREATE TABLE IF NOT EXISTS orders (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      total REAL NOT NULL,
-      payment_status TEXT NOT NULL DEFAULT 'pending',
-      payment_mode TEXT,
-      paid_at TEXT,
-      created_at TEXT NOT NULL DEFAULT (datetime('now','+5 hours','30 minutes'))
-    );
+      CREATE TABLE IF NOT EXISTS orders (
+        id SERIAL PRIMARY KEY,
+        total REAL NOT NULL,
+        payment_status TEXT NOT NULL DEFAULT 'pending',
+        payment_mode TEXT,
+        paid_at TEXT,
+        created_at TEXT NOT NULL DEFAULT (NOW() + INTERVAL '5 hours 30 minutes')
+      );
 
-    CREATE TABLE IF NOT EXISTS order_items (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      order_id INTEGER NOT NULL,
-      menu_item_id INTEGER,
-      name TEXT NOT NULL,
-      price REAL NOT NULL,
-      qty INTEGER NOT NULL,
-      line_total REAL NOT NULL,
-      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
-    );
+      CREATE TABLE IF NOT EXISTS order_items (
+        id SERIAL PRIMARY KEY,
+        order_id INTEGER NOT NULL,
+        menu_item_id INTEGER,
+        name TEXT NOT NULL,
+        price REAL NOT NULL,
+        qty INTEGER NOT NULL,
+        line_total REAL NOT NULL,
+        FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+      );
 
-    CREATE TABLE IF NOT EXISTS settings (
-      id INTEGER PRIMARY KEY CHECK (id = 1),
-      restaurant_name TEXT NOT NULL DEFAULT 'Shanthi Foods',
-      upi_id TEXT NOT NULL DEFAULT 'yourname@upi',
-      upi_payee_name TEXT NOT NULL DEFAULT 'Shanthi Foods'
-    );
-  `);
+      CREATE TABLE IF NOT EXISTS settings (
+        id INTEGER PRIMARY KEY DEFAULT 1,
+        restaurant_name TEXT NOT NULL DEFAULT 'Shanthi Foods',
+        upi_id TEXT NOT NULL DEFAULT 'yourname@upi',
+        upi_payee_name TEXT NOT NULL DEFAULT 'Shanthi Foods'
+      );
+    `);
+  } else {
+    // SQLite schema
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS menu_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        price REAL NOT NULL,
+        image_url TEXT DEFAULT '',
+        is_active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT (datetime('now','+5 hours','30 minutes'))
+      );
+
+      CREATE TABLE IF NOT EXISTS orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        total REAL NOT NULL,
+        payment_status TEXT NOT NULL DEFAULT 'pending',
+        payment_mode TEXT,
+        paid_at TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now','+5 hours','30 minutes'))
+      );
+
+      CREATE TABLE IF NOT EXISTS order_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_id INTEGER NOT NULL,
+        menu_item_id INTEGER,
+        name TEXT NOT NULL,
+        price REAL NOT NULL,
+        qty INTEGER NOT NULL,
+        line_total REAL NOT NULL,
+        FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+      );
+
+      CREATE TABLE IF NOT EXISTS settings (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        restaurant_name TEXT NOT NULL DEFAULT 'Shanthi Foods',
+        upi_id TEXT NOT NULL DEFAULT 'yourname@upi',
+        upi_payee_name TEXT NOT NULL DEFAULT 'Shanthi Foods'
+      );
+    `);
+  }
 
   const settingsCount = await db.prepare('SELECT COUNT(*) AS c FROM settings').get();
   if (settingsCount.c === 0) {
