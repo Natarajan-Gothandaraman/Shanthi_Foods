@@ -50,44 +50,54 @@ router.post('/', upload.single('image'), async (req, res) => {
   }
   const imageUrl = req.file ? `/uploads/${req.file.filename}` : req.body.image_url || '';
   const active = is_active === '0' || is_active === 'false' ? 0 : 1;
-  const result = await db
-    .prepare(
-      `INSERT INTO menu_items (name, price, image_url, is_active) VALUES (?, ?, ?, ?)`
-    )
-    .run(name.trim(), parseFloat(price), imageUrl, active);
-  const item = await db.prepare('SELECT * FROM menu_items WHERE id = ?').get(result.lastInsertRowid);
-  res.status(201).json(item);
+  try {
+    const result = await db
+      .prepare(
+        `INSERT INTO menu_items (name, price, image_url, is_active) VALUES (?, ?, ?, ?)`
+      )
+      .run(name.trim(), parseFloat(price), imageUrl, active);
+    const item = await db.prepare('SELECT * FROM menu_items WHERE id = ?').get(result.lastInsertRowid);
+    res.status(201).json(item);
+  } catch (err) {
+    console.error('Error saving menu item:', err);
+    res.status(500).json({ error: 'Failed to save menu item' });
+  }
 });
 
 router.put('/:id', upload.single('image'), async (req, res) => {
-  const existing = await db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
-  if (!existing) return res.status(404).json({ error: 'Menu item not found' });
+  try {
+    const existing = await db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
+    if (!existing) return res.status(404).json({ error: 'Menu item not found' });
 
-  const name = req.body.name !== undefined ? req.body.name.trim() : existing.name;
-  const price = req.body.price !== undefined ? parseFloat(req.body.price) : existing.price;
-  const active =
-    req.body.is_active !== undefined
-      ? req.body.is_active === '0' || req.body.is_active === 'false'
-        ? 0
-        : 1
-      : existing.is_active;
-  let imageUrl = existing.image_url;
-  if (req.file) {
-    imageUrl = `/uploads/${req.file.filename}`;
-    if (existing.image_url && existing.image_url.startsWith('/uploads/')) {
-      const oldPath = path.join(__dirname, '..', '..', 'public', existing.image_url);
-      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+    const name = req.body.name !== undefined ? req.body.name.trim() : existing.name;
+    const price = req.body.price !== undefined ? parseFloat(req.body.price) : existing.price;
+    const active =
+      req.body.is_active !== undefined
+        ? req.body.is_active === '0' || req.body.is_active === 'false'
+          ? 0
+          : 1
+        : existing.is_active;
+    let imageUrl = existing.image_url;
+    if (req.file) {
+      imageUrl = `/uploads/${req.file.filename}`;
+      if (existing.image_url && existing.image_url.startsWith('/uploads/')) {
+        const oldPath = path.join(__dirname, '..', '..', 'public', existing.image_url);
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      }
+    } else if (req.body.image_url !== undefined) {
+      imageUrl = req.body.image_url;
     }
-  } else if (req.body.image_url !== undefined) {
-    imageUrl = req.body.image_url;
+
+    await db.prepare(
+      `UPDATE menu_items SET name = ?, price = ?, image_url = ?, is_active = ? WHERE id = ?`
+    ).run(name, price, imageUrl, active, req.params.id);
+
+    const item = await db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
+    res.json(item);
+  } catch (err) {
+    console.error('Error updating menu item:', err);
+    res.status(500).json({ error: 'Failed to update menu item' });
   }
-
-  await db.prepare(
-    `UPDATE menu_items SET name = ?, price = ?, image_url = ?, is_active = ? WHERE id = ?`
-  ).run(name, price, imageUrl, active, req.params.id);
-
-  const item = await db.prepare('SELECT * FROM menu_items WHERE id = ?').get(req.params.id);
-  res.json(item);
 });
 
 router.delete('/:id', async (req, res) => {

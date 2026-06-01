@@ -32,6 +32,8 @@ if (usePostgres) {
             finalSql = finalSql.replace(/datetime\('now','\+5 hours','30 minutes'\)/g, "NOW() + INTERVAL '5 hours 30 minutes'");
             // Convert datetime(column) to just column (PostgreSQL doesn't need datetime wrapper)
             finalSql = finalSql.replace(/datetime\(([^)]+)\)/g, '$1');
+            // Convert date(column) to DATE(column) for PostgreSQL
+            finalSql = finalSql.replace(/date\(([^)]+)\)/g, 'DATE($1)');
             
             const result = await client.query(finalSql, params);
             return { lastInsertRowid: result.rows[0]?.id || result.insertId };
@@ -45,6 +47,8 @@ if (usePostgres) {
             let finalSql = pgSql.replace(/datetime\('now','\+5 hours','30 minutes'\)/g, "NOW() + INTERVAL '5 hours 30 minutes'");
             // Convert datetime(column) to just column (PostgreSQL doesn't need datetime wrapper)
             finalSql = finalSql.replace(/datetime\(([^)]+)\)/g, '$1');
+            // Convert date(column) to DATE(column) for PostgreSQL
+            finalSql = finalSql.replace(/date\(([^)]+)\)/g, 'DATE($1)');
             const result = await client.query(finalSql, params);
             return result.rows[0];
           } finally {
@@ -57,6 +61,8 @@ if (usePostgres) {
             let finalSql = pgSql.replace(/datetime\('now','\+5 hours','30 minutes'\)/g, "NOW() + INTERVAL '5 hours 30 minutes'");
             // Convert datetime(column) to just column (PostgreSQL doesn't need datetime wrapper)
             finalSql = finalSql.replace(/datetime\(([^)]+)\)/g, '$1');
+            // Convert date(column) to DATE(column) for PostgreSQL
+            finalSql = finalSql.replace(/date\(([^)]+)\)/g, 'DATE($1)');
             const result = await client.query(finalSql, params);
             return result.rows;
           } finally {
@@ -244,20 +250,25 @@ async function initDb() {
     `);
   }
 
-  const settingsCount = await db.prepare('SELECT COUNT(*) AS c FROM settings').get();
-  if (settingsCount.c === 0) {
+  // Initialize settings
+  try {
     await db.prepare(
       `INSERT INTO settings (id, restaurant_name, upi_id, upi_payee_name)
-       VALUES (1, 'Shanthi Foods', '9342938927@ptsbi', 'Shanthi Foods')`
+       VALUES (1, 'Shanthi Foods', '9342938927@ptsbi', 'Shanthi Foods')
+       ON CONFLICT (id) DO UPDATE SET
+         restaurant_name = EXCLUDED.restaurant_name,
+         upi_id = EXCLUDED.upi_id,
+         upi_payee_name = EXCLUDED.upi_payee_name`
     ).run();
-  } else {
-    await db.prepare(
-      `UPDATE settings SET
-         restaurant_name = 'Shanthi Foods',
-         upi_payee_name = CASE WHEN upi_payee_name IN ('South Kitchen', 'Restaurant', 'My Restaurant')
-           THEN 'Shanthi Foods' ELSE upi_payee_name END
-       WHERE restaurant_name IN ('South Kitchen', 'My Restaurant')`
-    ).run();
+  } catch (err) {
+    // If ON CONFLICT doesn't work (SQLite), try the old way
+    const settingsCount = await db.prepare('SELECT COUNT(*) AS c FROM settings').get();
+    if (settingsCount.c === 0) {
+      await db.prepare(
+        `INSERT INTO settings (id, restaurant_name, upi_id, upi_payee_name)
+         VALUES (1, 'Shanthi Foods', '9342938927@ptsbi', 'Shanthi Foods')`
+      ).run();
+    }
   }
 
   for (const [name, imageUrl] of Object.entries(MENU_IMAGE_MAP)) {
